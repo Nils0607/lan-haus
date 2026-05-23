@@ -1,26 +1,366 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   NEXUS UI — Primitive Tokens
+   Technologie-unabhängige, unveränderliche Design-Grundwerte.
+   Keine semantische Bedeutung, keine Komponentenbindung.
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* --- Brand gradient stops --- */
+  --color-brand-from: hsl(190 100% 50%);
+  --color-brand-to:   hsl(276 100% 56%);
+  --color-brand-gradient: linear-gradient(
+    135deg,
+    var(--color-brand-from) 0%,
+    var(--color-brand-to) 100%
+  );
+  --color-brand-glow: hsl(190 100% 50% / 0.45);
+
+  /* --- Red palette --- */
+  --color-red-100: hsl(358 100% 92%);
+  --color-red-300: hsl(358  92% 75%);
+  --color-red-500: hsl(358  85% 58%);
+  --color-red-700: hsl(358  75% 42%);
+  --color-red-900: hsl(358  65% 22%);
+
+  /* --- Blue palette --- */
+  --color-blue-100: hsl(206 100% 90%);
+  --color-blue-300: hsl(206 100% 72%);
+  --color-blue-500: hsl(206  95% 55%);
+  --color-blue-700: hsl(208  85% 38%);
+  --color-blue-900: hsl(210  75% 20%);
+
+  /* --- Purple palette --- */
+  --color-purple-100: hsl(276  90% 90%);
+  --color-purple-300: hsl(276  88% 75%);
+  --color-purple-500: hsl(276  82% 60%);
+  --color-purple-700: hsl(276  72% 42%);
+  --color-purple-900: hsl(276  62% 22%);
+
+  /* --- Background scale --- */
+  --color-bg-base:     hsl(228 28%  5%);
+  --color-bg-surface:  hsl(228 24%  9%);
+  --color-bg-elevated: hsl(228 20% 13%);
+  --color-bg-overlay:  hsl(228 40%  2% / 0.78);
+
+  /* --- Foreground / text scale --- */
+  --color-fg-headline: hsl(220 20% 98%);
+  --color-fg-body:     hsl(220 15% 86%);
+  --color-fg-muted:    hsl(220 10% 62%);
+  --color-fg-disabled: hsl(220  8% 38%);
+  --color-fg-on-brand: hsl(228 35%  6%);
+
+  /* --- Semantic status colors --- */
+  --color-success-default:    hsl(146 72% 48%);
+  --color-success-subtle:     hsl(146 72% 48% / 0.14);
+  --color-success-foreground: hsl(146 80% 78%);
+
+  --color-warning-default:    hsl( 38 95% 56%);
+  --color-warning-subtle:     hsl( 38 95% 56% / 0.14);
+  --color-warning-foreground: hsl( 38 95% 78%);
+
+  --color-error-default:      var(--color-red-500);
+  --color-error-subtle:       hsl(358 85% 58% / 0.14);
+  --color-error-foreground:   hsl(358 95% 82%);
+
+  --color-info-default:       var(--color-blue-500);
+  --color-info-subtle:        hsl(206 95% 55% / 0.14);
+  --color-info-foreground:    hsl(206 95% 82%);
+
+  /* --- Border / outline scale --- */
+  --outline-subtle:  hsl(220 15% 100% / 0.06);
+  --outline-default: hsl(220 15% 100% / 0.12);
+  --outline-strong:  hsl(220 15% 100% / 0.24);
+  --outline-brand:   var(--color-brand-from);
+  --outline-danger:  var(--color-red-500);
+
+  /* --- Typography (Next.js font loaders set --font-rajdhani / --font-dm-sans on <html>) --- */
+  --font-display: var(--font-rajdhani), "Rajdhani", system-ui, sans-serif;
+  --font-heading: var(--font-rajdhani), "Rajdhani", system-ui, sans-serif;
+  --font-body:    var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
+  --font-mono:    'DM Sans', ui-monospace, 'Courier New', monospace;
+
+  /*
+   * Typografie-Konvention (für Implementierung & Reviews):
+   * - Display / Heading → --font-display bzw. --font-heading (Rajdhani), Tailwind: font-display, font-heading
+   * - Fließtext, einfache Nav-Links (ohne Button-Chassis), Formularfelder → --font-body (DM Sans); html nutzt font-sans (= Body)
+   * - Alle Button-/CTA-Flächen → nur <Button /> aus src/components/ui/button.tsx:
+   *   variant primary (Gradient) | secondary (Outline Brand) | tertiary (Outline Default),
+   *   size sm | md | lg | icon — Farben nur über Design-Tokens in dieser Datei.
+   */
+
+  --font-size-display: clamp(2.5rem, 4.2vw + 1rem, 3.75rem);
+  --font-size-h1:      1.75rem;
+  --font-size-h2:      1.125rem;
+  --font-size-body:    0.9375rem;
+  --font-size-label:   0.625rem;
+
+  /* Rajdhani max. 700 — „black“-Typo nutzt Bold für echtes Outline-Gewicht */
+  --font-weight-black:   700;
+  --font-weight-bold:    700;
+  --font-weight-medium:  500;
+  --font-weight-regular: 400;
+
+  --line-height-display: 1.05;
+  --line-height-heading: 1.25;
+  --line-height-body:    1.6;
+
+  --letter-spacing-display: 0.02em;
+  --letter-spacing-heading: 0.04em;
+  --letter-spacing-body:    0;
+  --letter-spacing-label:   0.12em;
+
+  /* --- Spacing scale (4 px base) --- */
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+
+  /* --- Border radius scale --- */
+  --radius-none: 0px;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:  12px;
+  --radius-full: 9999px;
+
+  /* --- Glow / shadow effects --- */
+  --glow-brand: 0 0 12px 2px hsl(190 100% 50% / 0.40);
+  --glow-focus: 0 0 0 3px   hsl(190 100% 50% / 0.60);
 }
 
+/* ============================================================
+   NEXUS UI — Semantic Tokens  (shadcn-Variablen-Mapping)
+   Einzige Theme-Definition; kein separater Light-Mode.
+   shadcn-Komponenten konsumieren diese Variablen direkt.
+   ============================================================ */
+:root {
+  /* layout */
+  --background:         var(--color-bg-base);
+  --foreground:         var(--color-fg-body);
+
+  /* card */
+  --card:               var(--color-bg-surface);
+  --card-foreground:    var(--color-fg-headline);
+
+  /* popover */
+  --popover:            var(--color-bg-elevated);
+  --popover-foreground: var(--color-fg-headline);
+
+  /* primary — Brand Cyan */
+  --primary:            var(--color-brand-from);
+  --primary-foreground: var(--color-fg-on-brand);
+
+  /* secondary — Brand Purple */
+  --secondary:            var(--color-brand-to);
+  --secondary-foreground: var(--color-fg-on-brand);
+
+  /* muted */
+  --muted:            var(--color-bg-elevated);
+  --muted-foreground: var(--color-fg-muted);
+
+  /* accent — subtle brand surface */
+  --accent:            hsl(190 100% 50% / 0.12);
+  --accent-foreground: var(--color-brand-from);
+
+  /* destructive */
+  --destructive:            var(--color-error-default);
+  --destructive-foreground: var(--color-error-foreground);
+
+  /* borders & inputs */
+  --border: var(--outline-default);
+  --input:  var(--outline-subtle);
+  --ring:   var(--color-brand-from);
+
+  /* radius (shadcn uses --radius as base) */
+  --radius: var(--radius-md);
+
+  /* chart palette */
+  --chart-1: var(--color-brand-from);
+  --chart-2: var(--color-brand-to);
+  --chart-3: var(--color-success-default);
+  --chart-4: var(--color-warning-default);
+  --chart-5: var(--color-error-default);
+
+  /* sidebar */
+  --sidebar:                    var(--color-bg-surface);
+  --sidebar-foreground:         var(--color-fg-body);
+  --sidebar-primary:            var(--color-brand-from);
+  --sidebar-primary-foreground: var(--color-fg-on-brand);
+  --sidebar-accent:             hsl(190 100% 50% / 0.10);
+  --sidebar-accent-foreground:  var(--color-brand-from);
+  --sidebar-border:             var(--outline-subtle);
+  --sidebar-ring:               var(--color-brand-from);
+}
+
+/* ============================================================
+   Tailwind v4 — @theme: Token-Aliase für Utility-Klassen
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts — siehe :root Kommentar zu Rollen (Body für Buttons/CTAs) */
+  --font-sans:    var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-mono:    var(--font-mono);
+  --font-display: var(--font-display);
+
+  /* shadcn semantic colors → Tailwind utilities */
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+  --color-chart-1:            var(--chart-1);
+  --color-chart-2:            var(--chart-2);
+  --color-chart-3:            var(--chart-3);
+  --color-chart-4:            var(--chart-4);
+  --color-chart-5:            var(--chart-5);
+  --color-sidebar:                    var(--sidebar);
+  --color-sidebar-foreground:         var(--sidebar-foreground);
+  --color-sidebar-primary:            var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent:             var(--sidebar-accent);
+  --color-sidebar-accent-foreground:  var(--sidebar-accent-foreground);
+  --color-sidebar-border:             var(--sidebar-border);
+  --color-sidebar-ring:               var(--sidebar-ring);
+
+  /* Brand primitives als direkte Tailwind-Farben */
+  --color-brand:       var(--color-brand-from);
+  --color-brand-from:  var(--color-brand-from);
+  --color-brand-to:    var(--color-brand-to);
+  --color-brand-glow:  var(--color-brand-glow);
+
+  /* Background palette */
+  --color-bg-base:     var(--color-bg-base);
+  --color-bg-surface:  var(--color-bg-surface);
+  --color-bg-elevated: var(--color-bg-elevated);
+  --color-bg-overlay:  var(--color-bg-overlay);
+
+  /* Foreground palette */
+  --color-fg-headline: var(--color-fg-headline);
+  --color-fg-body:     var(--color-fg-body);
+  --color-fg-muted:    var(--color-fg-muted);
+  --color-fg-disabled: var(--color-fg-disabled);
+  --color-fg-on-brand: var(--color-fg-on-brand);
+
+  /* Red */
+  --color-red-100: var(--color-red-100);
+  --color-red-300: var(--color-red-300);
+  --color-red-500: var(--color-red-500);
+  --color-red-700: var(--color-red-700);
+  --color-red-900: var(--color-red-900);
+
+  /* Blue */
+  --color-blue-100: var(--color-blue-100);
+  --color-blue-300: var(--color-blue-300);
+  --color-blue-500: var(--color-blue-500);
+  --color-blue-700: var(--color-blue-700);
+  --color-blue-900: var(--color-blue-900);
+
+  /* Purple */
+  --color-purple-100: var(--color-purple-100);
+  --color-purple-300: var(--color-purple-300);
+  --color-purple-500: var(--color-purple-500);
+  --color-purple-700: var(--color-purple-700);
+  --color-purple-900: var(--color-purple-900);
+
+  /* Status */
+  --color-success:            var(--color-success-default);
+  --color-success-subtle:     var(--color-success-subtle);
+  --color-success-foreground: var(--color-success-foreground);
+  --color-warning:            var(--color-warning-default);
+  --color-warning-subtle:     var(--color-warning-subtle);
+  --color-warning-foreground: var(--color-warning-foreground);
+  --color-error:              var(--color-error-default);
+  --color-error-subtle:       var(--color-error-subtle);
+  --color-error-foreground:   var(--color-error-foreground);
+  --color-info:               var(--color-info-default);
+  --color-info-subtle:        var(--color-info-subtle);
+  --color-info-foreground:    var(--color-info-foreground);
+
+  /* Outline / border primitives */
+  --color-outline-subtle:  var(--outline-subtle);
+  --color-outline-default: var(--outline-default);
+  --color-outline-strong:  var(--outline-strong);
+  --color-outline-brand:   var(--outline-brand);
+  --color-outline-danger:  var(--outline-danger);
+
+  /* Typography scale */
+  --text-display: var(--font-size-display);
+  --text-h1:      var(--font-size-h1);
+  --text-h2:      var(--font-size-h2);
+  --text-body:    var(--font-size-body);
+  --text-label:   var(--font-size-label);
+
+  --leading-display: var(--line-height-display);
+  --leading-heading: var(--line-height-heading);
+  --leading-body:    var(--line-height-body);
+
+  --tracking-display: var(--letter-spacing-display);
+  --tracking-heading: var(--letter-spacing-heading);
+  --tracking-label:   var(--letter-spacing-label);
+
+  /* Spacing */
+  --spacing-1:  var(--space-1);
+  --spacing-2:  var(--space-2);
+  --spacing-3:  var(--space-3);
+  --spacing-4:  var(--space-4);
+  --spacing-5:  var(--space-5);
+  --spacing-6:  var(--space-6);
+  --spacing-8:  var(--space-8);
+  --spacing-10: var(--space-10);
+  --spacing-12: var(--space-12);
+  --spacing-16: var(--space-16);
+  --spacing-20: var(--space-20);
+
+  /* Radius */
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-full: var(--radius-full);
+
+  /* shadcn radius scale */
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   Base layer
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  html {
+    @apply font-sans;
+  }
 }
