@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: "NEXUS LAN · Gaming LAN Haus",
   description:
     "High-End Gaming LAN: Arena, 240 Hz, symmetrische Anbindung — Sessions für Teams, Creator und Community.",
+  verification: {
+    google: "MtpuGLVH0RjEr-tkqD_WK4Vhoz7W_vAmIk",
+  },
 };
 
 export default function RootLayout({
